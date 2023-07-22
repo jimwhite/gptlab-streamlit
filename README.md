@@ -141,6 +141,15 @@ To run the app locally, you will need to:
 1. Set up your own [Google Firestore](https://firebase.google.com/docs/firestore) database. 
     - GPT Lab uses four main collections: `users`, `user_hash`, `bots`, and `sessions`.
     - You will need to manually set up a `users` collection before you can run the app locally. (All otherh collections will be set up by the app). 
+    - Must create index:
+google.api_core.exceptions.FailedPrecondition: 400 The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/fovi-site/firestore/indexes?create_composite=Ckpwcm9qZWN0cy9mb3ZpLXNpdGUvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL3Nlc3Npb25zL2luZGV4ZXMvXxABGgoKBmJvdF9pZBABGhoKFnNlc3Npb25fc2NoZW1hX3ZlcnNpb24QARoLCgd1c2VyX2lkEAEaEAoMY3JlYXRlZF9kYXRlEAIaDAoIX19uYW1lX18QAg
+
+https://console.firebase.google.com/project/fovi-site/firestore/indexes
+Collection ID	Fields indexed 
+Query scope		Status	
+sessions	bot_id Ascending session_schema_version Ascending user_id Ascending created_date Descending __name__ Descending	Collection		Enabled	
+
+
 2. Clone this repository
 3. Create a .streamlit/secrets.toml file containing the following:
 ```
@@ -148,7 +157,7 @@ To run the app locally, you will need to:
 db-key = "YOUR GOOGLE SERVICE ACCOUNT TOML"
 
 [util]
-global_salt = "OPTIONAL GLOBAL SALT"
+global_salt = "OPTIONAL GLOBAL SALT value but must be defined, even if empty string"
 ```
 
 - You will need to generate a service account JSON, and convert that JSON file to TOML. Follow the instructions [here](https://blog.streamlit.io/streamlit-firestore-continued/). 
@@ -156,8 +165,10 @@ global_salt = "OPTIONAL GLOBAL SALT"
 4. In your terminal, set up your local envionrment: 
     - Set up a Python virtual environment (using `venv`, `conda`, `virtualenv`, or any other tool you prefer)
     - Install the required Python dependencies (`pip install -r app/requirements.txt`)
-    - Run `streamlit run app/home.py`
+    - Run `streamlit run app/home.py --server.enableCORS=false --server.enableXsrfProtection=false`
 
+## Running in Google Cloud Run
+gcloud builds submit --tag gcr.io/fovi-site/fovi-chat
 ## Contributions
 Contributions are welcomed. Simply open up an issue and create a pull request. If you are introducing new features, please provide a detailed description of the specific use case you are addressing and setup instructions to test. 
 

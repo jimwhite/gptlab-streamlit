@@ -1,3 +1,4 @@
+import traceback
 import streamlit as st
 import api_users as au 
 
@@ -37,6 +38,7 @@ class app_user:
             with self.container:
                 st.error(f"{str(e)}")
         except u.DBError as e:
+            traceback.print_exc()
             with self.container:
                 st.warning("Something went wrong. Please try again.")      
 

@@ -36,5 +36,4 @@ def st_button(url, label, font_awesome_icon):
 def render_cta():
   with st.sidebar:
       st.write("Let's connect!")
-      st_button(url="https://twitter.com/dclin", label="Twitter", font_awesome_icon="fa-twitter")
-      st_button(url="http://linkedin.com/in/d2clin/", label="LinkedIn", font_awesome_icon="fa-linkedin")
+      st_button(url="http://linkedin.com/in/jamespaulwhite/", label="LinkedIn", font_awesome_icon="fa-linkedin")

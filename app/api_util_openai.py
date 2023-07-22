@@ -79,7 +79,7 @@ class open_ai:
             models_list = [model.id for model in models['data']]
             gpt_lab_models_list = ['gpt-4-32k','gpt-4','gpt-3.5-turbo-16k', 'gpt-3.5-turbo', 'text-davinci-003', 'text-curie-001', 'text-babbage-001', 'text-ada-001']
             key_supported_models_list = [model for model in gpt_lab_models_list if model in models_list] 
-            #print(key_supported_models_list)
+            print(key_supported_models_list)
             return {'validated': True, 'supported_models_list': key_supported_models_list}
         except Exception as e:
             raise

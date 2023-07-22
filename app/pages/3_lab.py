@@ -1,3 +1,4 @@
+import traceback
 import streamlit as st 
 import api_bots as ab 
 import api_sessions as asessions 
@@ -391,12 +392,14 @@ def handler_lab_step_one_confirm():
             st.session_state.lab_msg_list.append({'is_user':False, 'message':bot_message})
         except s.OpenAIError as e: 
             st.session_state.lab_active_step = 1
+            traceback.print_exc()
             if e.error_type == "RateLimitError" and str(e) == "OpenAI: You exceeded your current quota, please check your plan and billing details.": 
                 st.error(f"Could not start a session with the AI assistant.  \n  \n{e}  \n  \n**Friendly reminder:** If you are using a free-trial OpenAI API key, this error is caused by the extremely low rate limits associated with the key. To optimize your chat experience, we recommend upgrading to the pay-as-you-go OpenAI plan. Please see our FAQ for more information.")
             else:
                 st.error(f"Could not start a session with the AI assistant.  \n  \n{e}")
         except (s.BadRequest, s.SessionNotRecorded, s.MessageNotRecorded, s.PromptNotRecorded, Exception) as e:
             st.session_state.lab_active_step = 1
+            traceback.print_exc()
             del st.session_state['lab_bot']
             st.error("Something went wrong. Could not start a session with the AI assistant. Please try again later.")
 
@@ -454,7 +457,7 @@ def handler_lab_step_three_confirm():
         st.session_state.lab_active_step = 4  
         st.session_state.lab_bot_id=bot_id
     else:
-        st.warning("Something went wrong. Please try again.")
+        st.warning("No bots in database! Please try again.")
 
 
 def handler_user_chat():

@@ -44,7 +44,7 @@ class bots:
         bot_docs = self.db.get_docs(collection_name="bots", query_filters=query_filters)
 
         if bot_docs == None:
-            raise self.DBError("Connection Problem: Try again later")
+            raise self.DBError("Bots collection empty!")
 
         bots = []
 

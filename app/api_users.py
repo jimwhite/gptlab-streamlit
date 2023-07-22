@@ -49,7 +49,7 @@ class users:
         user_docs = self.db.get_docs(collection_name="users", query_filters=query_filters)
 
         if user_docs == None:
-            raise self.DBError("Connection Problem: Try again later")
+            raise self.DBError("Users collection empty!")
 
         return user_docs 
 

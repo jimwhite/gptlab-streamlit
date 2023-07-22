@@ -1,3 +1,4 @@
+import traceback
 import streamlit as st 
 import app_user as vuser
 import app_utils as vutil
@@ -77,15 +78,18 @@ def handler_start_session():
         st.session_state.session_msg_list.append({'is_user':False, 'message':bot_message})
     except s.OpenAIError as e:
         _cleanup_handler_start_session_exception()
+        traceback.print_exc()
         if e.error_type == "RateLimitError" and str(e) == "OpenAI: You exceeded your current quota, please check your plan and billing details.": 
             st.error(f"{e}  \n  \n**Friendly reminder:** If you are using a free-trial OpenAI API key, this error is caused by the extremely low rate limits associated with the key. To optimize your chat experience, we recommend upgrading to the pay-as-you-go OpenAI plan. Please see our FAQ for more information.")
         else:
             st.error(f"{e}")
     except (s.SessionNotRecorded, s.PromptNotRecorded, s.MessageNotRecorded)  as e:
         _cleanup_handler_start_session_exception()
+        traceback.print_exc()
         st.error("Could not start a session with the AI assistant. Please try again later.")
     except (s.BadRequest, Exception) as e:
         _cleanup_handler_start_session_exception()
+        traceback.print_exc()
         st.error("Something went wrong. Could not start a session with the AI assistant. Please try again later.")
 
 
