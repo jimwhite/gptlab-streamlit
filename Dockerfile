@@ -8,12 +8,12 @@ ENV PYTHONUNBUFFERED True
 # Copy local code to the container image.
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY . ./
+COPY . /
 
 RUN pip install -U pip
-RUN pip install -r app/requirements.txt
+RUN pip install -r requirements.txt
 
-ENTRYPOINT ["streamlit", "run", "app/home.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
+ENTRYPOINT ["streamlit", "run", "home.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
 
 # docker buildx build -t gptlab-streamlit gptlab-streamlit 
-# 
+# gcloud builds submit --tag gcr.io/fovi-site/fovi-chat
