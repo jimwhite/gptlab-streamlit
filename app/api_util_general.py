@@ -26,7 +26,6 @@ def hash_user_string(user_string):
 
 ## private function to convert hex-encoded user hash value, converts to byte, and encode as URL-safe base64 string
 def _generate_user_key(user_hash):
-    print(user_hash)
     return base64.urlsafe_b64encode(bytes.fromhex(user_hash))
 
 # encrypt user message using Fernet encryption  

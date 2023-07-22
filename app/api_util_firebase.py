@@ -7,10 +7,9 @@ import traceback
 
 class firestore_db:
     def __init__(self):
-        # self.db = firestore.Client.from_service_account_info(db_key_dict)
         # Application Default credentials are automatically created.
-        # self.db = firestore.Client()
-        self.db = firestore.Client.from_service_account_json("/Users/jim/.gcloud/fovi-site-firebase-adminsdk.json")
+        self.db = firestore.Client()
+        # self.db = firestore.Client.from_service_account_json("fovi-site-firebase-adminsdk.json")
 
     def get_doc(self, collection_name, document_id, field_names=None, return_reference_only=None, max_tries=3, initial_backoff=1):
         doc_ref = self.db.collection(collection_name).document(document_id)
