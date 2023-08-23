@@ -3,13 +3,16 @@ import time
 from google.cloud import firestore 
 import streamlit as st 
 import traceback
-
+import os
 
 class firestore_db:
     def __init__(self):
-        # Application Default credentials are automatically created.
-        self.db = firestore.Client()
-        # self.db = firestore.Client.from_service_account_json("fovi-site-firebase-adminsdk.json")
+        if os.path.exists("fovi-site-firebase-adminsdk.json"):
+            print("Using service account credentials")
+            self.db = firestore.Client.from_service_account_json("fovi-site-firebase-adminsdk.json")
+        else:
+            # Application Default credentials are automatically created.
+            self.db = firestore.Client()
 
     def get_doc(self, collection_name, document_id, field_names=None, return_reference_only=None, max_tries=3, initial_backoff=1):
         doc_ref = self.db.collection(collection_name).document(document_id)
