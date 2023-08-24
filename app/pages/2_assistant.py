@@ -145,7 +145,7 @@ def handler_session_end():
             del st.session_state['session_msg_list']
 
     try:
-        session_response = s.get_session_response(session_id=st.session_state.session_id, oai_api_key=st.session_state.user['api_key'], user_message=st.session_state.bot_info['summary_prompt_msg'])
+        session_response = s.get_session_response(session_id=st.session_state.session_id, user_message=st.session_state.bot_info['summary_prompt_msg'])
         if session_response:
             st.session_state.session_msg_list.append({"message":session_response['bot_message'], "is_user": False})
     except s.OpenAIError as e: 

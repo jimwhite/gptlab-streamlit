@@ -1,28 +1,21 @@
 import os
-from langchain.callbacks import StreamlitCallbackHandler
+from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.prompts import PromptTemplate
-import openai
+import api_util_openai as ou
 from pathlib import Path
 
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.schema import ChatMessage
 import streamlit as st
-
+import app_user as vuser
 
 PROMPT_TEMPLATE_PATH = (Path(__file__).parent.parent / "prompt_template.txt").absolute()
 
 page_icon = "🥼"  # 🧠 (brain) 🤖 (robot) 🥼 (lab coat) 📖 (open book) ♾️ (infinity)
 st.set_page_config(page_title="Ildebot", page_icon=page_icon)
 st.title(f"{page_icon} Ildebot")
-
-# st.set_page_config(
-#     page_title="Fovi - Assistant",
-#     page_icon="https://api.dicebear.com/5.x/bottts-neutral/svg?seed=gptLAb"
-# )
 
 st.markdown(
     "<style>#MainMenu{visibility:hidden;}</style>",
@@ -34,38 +27,13 @@ Ildebot is a Proof of Concept for a virtually intelligent chat agent that guides
 View the [blog post about the First UX Framework](https://saasgrowers.com/blog/the-ultimate-user-onboarding-guide-for-b2b-saas-products/).
 """
 
-# app_desc = '''
-# Fovi Demo.
-# The user must authorize using a Google account to log in into this application.
-# '''
-# login_info = login(
-#     app_name="Fovi",
-#     app_desc=app_desc
-# )
-# if login_info:
-#     user_id, user_email = login_info
-#     st.write(f"Welcome {user_email}")
-# else:
-#     st.info("Please log in to continue")
-#     st.stop()
-
-# Get an OpenAI API Key before continuing
-if "openai_api_key" in st.secrets:
-    openai_api_key = st.secrets.openai_api_key
-elif os.environ.get("OPENAI_API_KEY"):
-    openai_api_key = os.environ.get("OPENAI_API_KEY")
-else:
-    openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
-if not openai_api_key:
-    st.info("Enter an OpenAI API Key to continue")
+if 'user' not in st.session_state or st.session_state.user['id'] is None:
+    st.markdown("---")
+    # ac.robo_avatar_component()
+    st.write("\n")
+    uu = vuser.app_user()
+    uu.view_get_info()
     st.stop()
-
-@st.cache_data(ttl=60 * 60 * 6)
-def get_model_names(openai_api_key):
-    print("Fetching model names from OpenAI API")
-    models = openai.Model.list(openai_api_key=openai_api_key)
-    print(f"Fetched {len(models)} models from OpenAI API")
-    return [model["id"] for model in models["data"] if model["id"].startswith("gpt")]
 
 @st.cache_data
 def get_prompt_template():
@@ -74,7 +42,7 @@ def get_prompt_template():
 
 # Choose a model
 with st.sidebar:
-    model_name = st.selectbox("Choose the OpenAI chat model to use", get_model_names(openai_api_key))
+    model_name = st.selectbox("Choose the OpenAI chat model to use", ou.get_model_names())
 
 # Set up memory
 msgs = StreamlitChatMessageHistory()
@@ -100,7 +68,7 @@ for idx, msg in enumerate(msgs.messages):
         st.write(msg.content)
 
 prompt = PromptTemplate(input_variables=["history", "human_input"], template=get_prompt_template())
-llm = ChatOpenAI(openai_api_key=openai_api_key, model_name=model_name, streaming=True)
+llm = ChatOpenAI(openai_api_key=ou.get_openai_api_key(), model_name=model_name, streaming=True)
 llm_chain = LLMChain(llm=llm, prompt=prompt, memory=memory, output_key='output')
 print(f'llm_chain.input_keys: {llm_chain.input_keys}')
 

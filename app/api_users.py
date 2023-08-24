@@ -74,21 +74,23 @@ class users:
             self.db.increment_document_fields(collection_name="users", document_id=user_id, field_name=metric_value_pair[0], increment=metric_value_pair[1])
 
 
-    def create_user(self, user_hash, email, password_hash):
-        user = self.get_users(user_id=user_hash)
+    def create_user(self, email, password_hash):
+        user_id = gu.email_to_user_id(email)
+        users = self.get_users(user_id=user_id)
 
-        if len(user) > 0:
+        if len(users) > 0:
             raise self.BadRequest("Bad request: user exists")
 
         user_dict = {
-            'user_hash': user_hash,
+            'user_hash': user_id,
             'email': email,
             'password_hash': password_hash,
             'created_date': gu.get_current_time(),
-            'last_modified_date': gu.get_current_time()
+            'last_modified_date': gu.get_current_time(),
+            'email_validated': False,
         }
 
-        user_id = self.db.create_doc(collection_name="users",data=user_dict)
+        user_id = self.db.create_doc(collection_name="users", id=user_id, data=user_dict)
         return user_id 
 
 
@@ -121,28 +123,17 @@ class users:
 
         # first try to create a user_hash document using the hashed key 
         try:
-            self.create_user_hash(user_hash=user_id)
-        except self.BadRequest:
-            # swallows exception if user hash already exists 
-            pass 
-
-        try:
-            # create a user with user hash 
-            user_id = self.create_user(user_hash=user_id, email=email, password_hash=password_hash)
+            user = self.get_user(user_id=email)
+        except self.UserNotFound:
+            # create a user with email for user_id 
+            user_id = self.create_user(email=email, password_hash=password_hash)
             # get user details 
             user = self.get_user(user_id=user_id) 
-
-        except self.BadRequest:
-            # since user exists, just get user details 
-            user = self.get_users(user_id=user_id)
-            
-            if len(user) > 1:
-                raise self.BadRequest("Bad request: more than one user with API key")
-            user =  user[0] 
-            if user['password_hash'] != password_hash:
-                raise self.BadRequest("Bad request: password mismatch")
         
+        if user['data']['password_hash'] != password_hash:
+            raise self.UserNotFound("No match for that email and password.")
+
         # Add the supported models list to the user object
         user['data']['supported_models_list'] = []
-
+        print(user)
         return user

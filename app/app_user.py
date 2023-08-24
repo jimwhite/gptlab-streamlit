@@ -34,7 +34,7 @@ class app_user:
             # st.info(user_email_prompt)
             st.text_input(user_email_prompt, key="user_email_input", placeholder=email_placeholder)
             # st.info(user_password_prompt)
-            st.text_input(user_password_prompt, key="user_password_input", placeholder=password_placeholder)
+            st.text_input(user_password_prompt, key="user_password_input", type="password", placeholder=password_placeholder)
             st.button("Sign In/Up", key="user_signin_button", on_click=self._validate_user_info)
 
     def _validate_user_info(self):
@@ -42,9 +42,15 @@ class app_user:
 
         try:
             email=gu.normalize_email(st.session_state.user_email_input)
-            password_hash=gu.hash_user_string(st.session_state.user_password_input)
-            user = u.get_create_user(email=email, password_hash=password_hash)           
-            self._set_info(user_id=user['id'], email=user['data']['email'], key_supported_models_list=user['data']['supported_models_list'])
+            password = st.session_state.user_password_input.strip()
+            if password:
+                password_hash=gu.hash_user_string(password)
+                user = u.get_create_user(email=email, password_hash=password_hash)           
+                self._set_info(user_id=user['id'], email=user['data']['email'], key_supported_models_list=user['data']['supported_models_list'])
+            else:
+                with self.container:
+                    st.error("User password cannot be empty.")
+                raise u.DBError("Password was empty.")
         except u.OpenAIError as e: 
             with self.container:
                 st.error(f"{str(e)}")

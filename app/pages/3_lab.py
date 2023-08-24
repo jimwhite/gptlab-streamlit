@@ -6,13 +6,13 @@ import api_sessions as asessions
 import app_user as uv 
 import app_utils as vutil
 import app_component as au
+import api_util_openai as ou
 
 st.set_page_config(
     page_title="Fovi Lab - Lab",
     page_icon="https://api.dicebear.com/5.x/bottts-neutral/svg?seed=gptLAb"#,
     #menu_items={"About": "Fovi Lab is a user-friendly app that allows anyone to interact with and create their own AI Assistants powered by OpenAI's GPT-3 language model. Our goal is to make AI accessible and easy to use for everyone, so you can focus on designing your Assistant without worrying about the underlying infrastructure.", "Get help": None, "Report a Bug": None}
 )
-
 
 st.markdown(
     "<style>#MainMenu{visibility:hidden;}</style>",
@@ -100,7 +100,6 @@ model_params = {
 model_personality_list = list(model_params.keys())
 
 ai_models_list = ['gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'text-davinci-003', 'text-curie-001', 'text-babbage-001', 'text-ada-001']
-
 
 b = ab.bots()
 session_types = []
@@ -466,7 +465,7 @@ def handler_user_chat():
 
     s = asessions.sessions(user_hash=st.session_state['user']['user_hash'])
     try:
-        session_response = s.get_session_response(session_id=st.session_state.lab_session_id, oai_api_key=st.session_state.user['api_key'], user_message=user_message)
+        session_response = s.get_session_response(session_id=st.session_state.lab_session_id, user_message=user_message)
         if session_response:
             if session_response['user_message_flagged'] == True:
                 flagged_categories_str = ", ".join(session_response['user_message_flagged_categories'])
@@ -502,7 +501,8 @@ else:
 
     if st.session_state.lab_active_step == 1:
         # overwrite the model list based on models that user's API key has access to 
-        ai_models_list = st.session_state.user['key_supported_models_list']
+        # ai_models_list = st.session_state.user['key_supported_models_list']
+        ai_models_list = ou.get_model_names()
         render_lab_step_one()
     elif st.session_state.lab_active_step == 2:
         render_lab_step_two()

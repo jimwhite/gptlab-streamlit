@@ -3,6 +3,24 @@ import streamlit as st
 import api_util_general as gu 
 import time 
 import logging 
+import os
+
+# Get an OpenAI API Key before continuing
+@st.cache_data(ttl=60 * 60 * 6)
+def get_openai_api_key():
+    if "openai_api_key" in st.secrets:
+        return st.secrets.openai_api_key
+    if os.environ.get("OPENAI_API_KEY"):
+        return os.environ.get("OPENAI_API_KEY")
+    return None
+
+
+@st.cache_data(ttl=60 * 60 * 6)
+def get_model_names():
+    print("Fetching model names from OpenAI API")
+    models = openai.Model.list(openai_api_key=get_openai_api_key())
+    print(f"Fetched {len(models)} models from OpenAI API")
+    return [model["id"] for model in models["data"] if model["id"].startswith("gpt")]
 
 
 class open_ai:
@@ -12,9 +30,9 @@ class open_ai:
             super().__init__(message)
             self.error_type = error_type 
 
-    def __init__(self, api_key, restart_sequence, stop_sequence):
+    def __init__(self, restart_sequence, stop_sequence, api_key=None):
         self.api_key = api_key
-        openai.api_key = api_key 
+        openai.api_key = api_key if api_key else get_openai_api_key()
         self.stop_sequence = stop_sequence
         self.restart_sequence = restart_sequence
         openai.util.logger.setLevel(logging.WARNING)
@@ -73,7 +91,7 @@ class open_ai:
 
 
     def validate_key(self):
-        """Main function to validate an OpenAI key, by making a free content moderation call"""
+        """Main function to validate an OpenAI key, by making free list models call"""
         try:
             models = self._get_models()
             models_list = [model.id for model in models['data']]
@@ -275,5 +293,4 @@ class open_ai:
             for message in messages:
                 oai_messages.append({'role':message['role'], 'content':message['message']})
         return oai_messages 
-
 
