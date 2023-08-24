@@ -69,5 +69,3 @@ if __name__ == '__main__':
         vu.view_get_info()
     else:
         vu.view_success_confirmation()
-
-st.write(st.session_state)
