@@ -104,15 +104,25 @@ llm = ChatOpenAI(openai_api_key=openai_api_key, model_name=model_name, streaming
 llm_chain = LLMChain(llm=llm, prompt=prompt, memory=memory, output_key='output')
 print(f'llm_chain.input_keys: {llm_chain.input_keys}')
 
+class StreamHandler(BaseCallbackHandler):
+    def __init__(self, container, initial_text=""):
+        self.container = container
+        self.text = initial_text
+
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        self.text += token
+        self.container.markdown(self.text)
+
 if chat_input := st.chat_input():
     # st.session_state.messages.append(ChatMessage(role="user", content=chat_input))
     st.chat_message("user").write(chat_input)
     with st.chat_message("ai"):
-        st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+        # st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+        st_cb = StreamHandler(st.empty())
         print(f'memory: {memory.memory_variables}')
         print(f'llm_chain.output_keys: {llm_chain.output_keys}')
         response = llm_chain.run({'human_input':chat_input}, callbacks=[st_cb])
-        st.write(response)
+        # st.write(response)
         # st.session_state.steps[str(len(msgs.messages) - 1)] = response["intermediate_steps"]
         # st.session_state.messages.append(ChatMessage(role="assistant", content=response.content))
 
