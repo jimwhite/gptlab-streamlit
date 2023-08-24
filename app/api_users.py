@@ -25,10 +25,11 @@ class users:
     def __init__(self):
         self.db = fu.firestore_db()
 
-    def find_user(self, user_string):
-        user_hash = gu.hash_user_string(user_string)
-        user = self.db.get_doc(collection_name="users", document_id=user_hash)
+    def find_user(self, email):
+        user_id = gu.email_to_user_id(email)
+        user = self.db.get_doc(collection_name="users", document_id=user_id)
         if user:     
+            print(f"find_user('{email}'): {user}")
             return user
         else:
             raise self.UserNotFound("User not found")
@@ -40,11 +41,11 @@ class users:
         else:
             raise self.UserNotFound("User not found")
 
-    def get_users(self, user_hash=None):
+    def get_users(self, user_id=None):
         query_filters=[]
 
-        if user_hash:
-            query_filters = [("user_hash","==",user_hash)]
+        if user_id:
+            query_filters = [("user_id","==",user_id)]
 
         user_docs = self.db.get_docs(collection_name="users", query_filters=query_filters)
 
@@ -73,14 +74,16 @@ class users:
             self.db.increment_document_fields(collection_name="users", document_id=user_id, field_name=metric_value_pair[0], increment=metric_value_pair[1])
 
 
-    def create_user(self, user_hash):
-        user = self.get_users(user_hash=user_hash)
+    def create_user(self, user_hash, email, password_hash):
+        user = self.get_users(user_id=user_hash)
 
         if len(user) > 0:
             raise self.BadRequest("Bad request: user exists")
 
         user_dict = {
             'user_hash': user_hash,
+            'email': email,
+            'password_hash': password_hash,
             'created_date': gu.get_current_time(),
             'last_modified_date': gu.get_current_time()
         }
@@ -105,46 +108,41 @@ class users:
             pass
 
         user_hash_dict = {
-            'user_hash_type': 'open_ai_key',
+            'user_hash_type': 'email',
             'created_date': gu.get_current_time()
         }
 
-        user_hash_id = self.db.create_doc(collection_name="user_hash",data=user_hash_dict, id=user_hash)
+        user_hash_id = self.db.create_doc(collection_name="user_hash", data=user_hash_dict, id=user_hash)
         return user_hash_id 
 
 
-    def get_create_user(self, api_key):
-        try:
-            o = ou.open_ai(api_key=api_key, restart_sequence='|USER|', stop_sequence='|SP|')
-            validation_info = o.validate_key()
-            supported_models_list = validation_info['supported_models_list']
-        except o.OpenAIError as e:  
-            raise self.OpenAIError(f"{str(e)}", error_type=e.error_type) from e 
-
-        user_hash = gu.hash_user_string(api_key)
+    def get_create_user(self, email, password_hash):
+        user_id = gu.email_to_user_id(email)
 
         # first try to create a user_hash document using the hashed key 
         try:
-            self.create_user_hash(user_hash=user_hash)
+            self.create_user_hash(user_hash=user_id)
         except self.BadRequest:
             # swallows exception if user hash already exists 
             pass 
 
         try:
             # create a user with user hash 
-            user_id = self.create_user(user_hash=user_hash)
+            user_id = self.create_user(user_hash=user_id, email=email, password_hash=password_hash)
             # get user details 
             user = self.get_user(user_id=user_id) 
 
         except self.BadRequest:
             # since user exists, just get user details 
-            user = self.get_users(user_hash=user_hash)
+            user = self.get_users(user_id=user_id)
             
             if len(user) > 1:
                 raise self.BadRequest("Bad request: more than one user with API key")
             user =  user[0] 
+            if user['password_hash'] != password_hash:
+                raise self.BadRequest("Bad request: password mismatch")
         
         # Add the supported models list to the user object
-        user['data']['supported_models_list'] = supported_models_list
+        user['data']['supported_models_list'] = []
 
         return user

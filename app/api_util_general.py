@@ -1,7 +1,9 @@
+import asyncio
 import hashlib
 import binascii
 import uuid 
 import datetime 
+import email_normalize
 import pytz 
 from cryptography.fernet import Fernet
 import base64
@@ -17,6 +19,27 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)s] %(m
 # general helper function 
 def generate_uuid():
     return str(uuid.uuid4())
+
+def get_or_create_eventloop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return asyncio.get_event_loop()
+        
+def normalize_email(email):
+    try:
+        get_or_create_eventloop()
+        print(type(email))
+        return email_normalize.normalize(email.strip()).normalized_address
+    except Exception as ex:
+        logging.error("Error normalizing email: {}".format(ex))
+        return email.strip()
+
+def email_to_user_id(email):
+    return normalize_email(email).lower()
 
 def hash_user_string(user_string):
     salt = user_string.encode()
