@@ -10,7 +10,7 @@ import csv
 import io 
 
 st.set_page_config(
-    page_title="Fovi - Assistant",
+    page_title="Fovi Lab - Assistant",
     page_icon="https://api.dicebear.com/5.x/bottts-neutral/svg?seed=gptLAb"
 )
 

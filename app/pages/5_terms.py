@@ -2,7 +2,7 @@ import streamlit as st
 import app_component as au
 
 st.set_page_config(
-    page_title="Fovi - Terms",
+    page_title="Fovi LLC - Terms",
     page_icon="https://api.dicebear.com/5.x/bottts-neutral/svg?seed=gptLAb"#,
     #menu_items={"About": "Fovi is a user-friendly app that allows anyone to interact with and create their own AI Assistants powered by OpenAI's GPT language model. Our goal is to make AI accessible and easy to use for everyone, so you can focus on designing your Assistant without worrying about the underlying infrastructure.", "Get help": None, "Report a Bug": None}
 )
@@ -26,7 +26,7 @@ st.write("Last updated: 2023-06-06")
 st.header("Terms of Use")
 
 st.info("""
-Welcome to Fovi, a platform hosted by Fovi LLC ("Fovi," "we," or "us"). By accessing our hosted services, you agree to comply with the following terms of service. These terms specifically apply to the hosted version of our services. The open source code used for these services is provided under the MIT License. Please read these terms and the license agreement carefully. If you do not agree to these terms or the license agreement, you should not use our hosted services or the open source code.
+Welcome to Fovi Lab (Early Access), a platform hosted by Fovi LLC ("Fovi," "we," or "us"). By accessing our hosted services, you agree to comply with the following terms of service. These terms specifically apply to the hosted version of our services. The open source code used for these services is provided under the MIT License. Please read these terms and the license agreement carefully. If you do not agree to these terms or the license agreement, you should not use our hosted services or the open source code.
 """)
 
 st.markdown("""
@@ -98,17 +98,14 @@ st.header("Privacy Policy")
 st.markdown("""
 At Fovi, we value your privacy and are committed to protecting it when you use our hosted platform. Here's how we handle your data:
 
-##### 1. OpenAI API Key  \n
-When you sign in to Fovi hosted service, we require you to enter your OpenAI API Key. Our application uses your Key during sessions to interact with the AI models and to tie your AI Assistants and sessions to your unique user identity. We do not store your OpenAI API Key in plaintext. To ensure your confidentiality and security, we use a one-way hashing algorithm on your Open AI API Key to generate your unique user identity rather than collecting or storing Personal-Identifiable-Information (PII).
+##### 1. Your Email  \n
+When you sign in to Fovi hosted service, we require you to enter a valid email and a password. We do not send your email to OpenAI during message processing. We only store a secure hash of your password, not the plaintext.
 
 ##### 2. AI Assistant Prompts and User Chat Session Messages  \n
-Your AI Assistant Prompts and your chat session messages on the hosted platform are transmitted and processed by OpenAI. We store both on our Google Firestore database (located in central United States), but they are only tied to your anonymized user identifier, generated from the hashed value of your OpenAI API Key. Your information is encrypted at rest and in transit by our cloud provider (Google) and limited to authorized personnel. Additionally, we symmetrically encrypt your session messages with a unique key assigned to you before storing them on our server, ensuring they remain private on our server. The prompts are stored unencrypted and may be reviewed and audited periodically to ensure compliance with our Terms.
+Your AI Assistant Prompts and your chat session messages on the hosted platform are transmitted and processed by OpenAI. We store both on our Google Firestore database (located in central United States) and they are tied to your email. Your information is encrypted at rest and in transit by our cloud provider (Google) and limited to authorized personnel. Additionally, we symmetrically encrypt your session messages with a unique key assigned to you before storing them on our server, ensuring they remain private on our server. The prompts are stored unencrypted and may be reviewed and audited periodically to ensure compliance with our Terms.
 
 ##### 3. Cookies  \n
 Our hosted service currently currently does not use cookies. However, we reserve the right to use cookies in the future to improve your experience and enhance the security of our platform. If we do, we will update this Privacy Policy to reflect the changes.
-
-##### 4. "Buy Me a Coffee" and Newsletters  \n
-If you choose to donate to our "Buy Me a Coffee" link (hosted by [Buy Me a Coffee](https://www.buymeacoffee.com)) (THANK YOU!) or subscribe to our newsletter (hosted by [BeeHiiv](https://www.beehiiv.com)), your email address will be collected and stored by the respective platforms for the purpose of contacting you in the future. Please refer to their respective privacy policies for more information. We do not collect and store these information from third-party services.
 
 By using the hosted version of Fovi, you consent to this Privacy Policy. If you have any questions or concerns about our privacy policy, please contact us at hello@gptlab.app.
 """)
