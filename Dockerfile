@@ -15,5 +15,6 @@ RUN pip install -r requirements.txt
 
 ENTRYPOINT ["streamlit", "run", "home.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
 
-# docker buildx build -t gptlab-streamlit gptlab-streamlit 
-# gcloud builds submit --tag gcr.io/fovi-site/fovi-chat
+# docker buildx build -t fovi-lab .
+# docker run -p 8080:8080 --env OPENAI_API_KEY="$OPENAI_API_KEY" fovi-lab
+# gcloud builds submit --tag gcr.io/fovi-site/fovi-lab

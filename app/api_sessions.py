@@ -92,7 +92,7 @@ class sessions:
         }
 
 
-    def get_session_response(self, session_id, oai_api_key, user_message=None):
+    def get_session_response(self, session_id, user_message=None):
         """
         Main method to get a bot chat response
 
@@ -104,7 +104,7 @@ class sessions:
         if current_session == None:
             raise self.BadRequest("Bad request: session not found")
                       
-        o = ou.open_ai(api_key=oai_api_key, restart_sequence=self.openai_restart_sequence, stop_sequence=self.openai_stop_sequence)
+        o = ou.open_ai(restart_sequence=self.openai_restart_sequence, stop_sequence=self.openai_stop_sequence)
 
         current_session_messages = []
         content_moderation_check = {'flagged':0,'flagged_categories':[]}
