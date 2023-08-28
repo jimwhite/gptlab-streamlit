@@ -82,27 +82,24 @@ logging.info(st.session_state.bot_data)
 #     render_chat_session()
 
 page_icon = "🥼"  # 🧠 (brain) 🤖 (robot) 🥼 (lab coat) 📖 (open book) ♾️ (infinity)
-st.set_page_config(page_title="Ildebot", page_icon=page_icon)
-st.title(f"{page_icon} Ildebot")
+bot_name = st.session_state.bot_info['name']
+st.set_page_config(page_title=f"Fovi: {bot_name} - Chat", page_icon=page_icon)
+st.title(f"{page_icon} Chat with {bot_name}")
 
 st.markdown(
     "<style>#MainMenu{visibility:hidden;}</style>",
     unsafe_allow_html=True
 )
 
-# """
-# Ildebot is a Proof of Concept for a virtually intelligent chat agent that guides you in applying SaaSGrowers.com's First UX Framework.
-# View the [blog post about the First UX Framework](https://saasgrowers.com/blog/the-ultimate-user-onboarding-guide-for-b2b-saas-products/).
-# """
+# Choose a model
+with st.sidebar:
+    model_name = st.selectbox("Choose the OpenAI chat model to use", ou.get_model_names())
 
 """
 Proof of Concept for Fovi AI chatbots that have a memory of the conversation history and can use that memory to guide the conversation.
 """
 
-# Choose a model
-with st.sidebar:
-    model_name = st.selectbox("Choose the OpenAI chat model to use", ou.get_model_names())
-
+st.markdown(st.session_state.bot_info['description'])
 
 class StreamHandler(BaseCallbackHandler):
     def __init__(self, container, initial_text=""):
@@ -122,7 +119,8 @@ memory = ConversationBufferMemory(
 if len(msgs.messages) == 0:
     # msgs.add_ai_message("How can I help you?")
     # st.session_state["messages"] = [ChatMessage(role="assistant", content="How can I help you?")]
-    msgs.add_ai_message("Hello.  Would you like to explore how to apply First UX Platform to your B2B SaaS?")
+    # msgs.add_ai_message("Hello.  Would you like to explore how to apply First UX Platform to your B2B SaaS?")
+    msgs.add_ai_message("Hello!")
     st.session_state.steps = {}
 
 avatars = {"human": "user", "ai": "assistant"}
