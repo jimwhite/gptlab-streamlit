@@ -54,7 +54,8 @@ class bots:
                 'name': bot['data']['name'],
                 'tag_line': bot['data']['tag_line'],
                 'description': bot['data']['description'],
-                'sessions_started': bot['data'].get('sessions_started',0)
+                'sessions_started': bot['data'].get('sessions_started',0),
+                'run_type': bot['data']['run_type'] if 'run_type' in bot['data'] else 'assistant',
             })
         
         return bots 

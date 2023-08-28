@@ -39,7 +39,11 @@ def view_bot_grid(bot_dict, button_disabled=False, show_bot_id=False):
                 col1.write(f"Session{'s' if bot_dict[i]['sessions_started'] > 1 else ''}: {bot_dict[i]['sessions_started']}")
             if col1.button(button_label, key=button_key, disabled=button_disabled):
                 st.session_state.bot_info=bot_dict[i]
-                au.switch_page('assistant')
+                st.session_state.bot_data=b.get_bot(bot_id=bot_dict[i]['id'])
+                if st.session_state.bot_info['run_type'] == 'langchain':
+                    au.switch_page('langchain')
+                else:
+                    au.switch_page('assistant')
             col1.write("\n\n")
         else:
             with col2:
@@ -54,7 +58,11 @@ def view_bot_grid(bot_dict, button_disabled=False, show_bot_id=False):
                 col2.write(f"Session{'s' if bot_dict[i]['sessions_started'] > 1 else ''}: {bot_dict[i]['sessions_started']}")
             if col2.button(button_label, key=button_key, disabled=button_disabled):
                 st.session_state.bot_info=bot_dict[i]
-                au.switch_page('assistant')
+                st.session_state.bot_data=b.get_bot(bot_id=bot_dict[i]['id'])
+                if st.session_state.bot_info['run_type'] == 'langchain':
+                    au.switch_page('langchain')
+                else:
+                    au.switch_page('assistant')
             col2.write("\n\n")
 
 

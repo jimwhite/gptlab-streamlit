@@ -1,17 +1,85 @@
-import os
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.prompts import PromptTemplate
-import api_util_openai as ou
+
 from pathlib import Path
 
 import streamlit as st
-import app_user as vuser
 
-PROMPT_TEMPLATE_PATH = (Path(__file__).parent.parent / "prompt_template.txt").absolute()
+import app_component as ac 
+import app_user as vuser
+import api_bots as bots
+import api_util_openai as ou
+import app_utils as au 
+
+import logging
+
+if 'user' not in st.session_state or st.session_state.user['id'] is None:
+    st.markdown("---")
+    # ac.robo_avatar_component()
+    st.write("\n")
+    uu = vuser.app_user()
+    uu.view_get_info()
+    st.stop()
+
+# centralize logic to go back to the lounge 
+def handler_back_to_lounge(): 
+    if "bot_info" in st.session_state:
+        del st.session_state['bot_info']
+    if "session_id" in st.session_state:
+        del st.session_state['session_id']
+    if "session_bot_id" in st.session_state:
+        del st.session_state['session_bot_id']
+    if "session_ended" in st.session_state:
+        del st.session_state['session_ended']
+    if "session_msg_list" in st.session_state:
+        del st.session_state['session_msg_list']
+    au.switch_page('lounge')
+
+def render_bot_search():
+    st.title("AI Assistant")
+    st.write("Discover other Assistants in the Lounge, or locate a specific Assistant by its personalized code.")
+    #st.markdown("---")
+    ac.robo_avatar_component()
+    st.write("\n")
+    # search_container = st.container()
+    # with search_container:
+    #     st.text_input("Find an AI Assistant by entering its personalized code", key = "bot_search_input", on_change=handler_bot_search, args=(search_container,))
+    # st.write("or")
+    if st.button("Back to Lounge"):
+        handler_back_to_lounge()
+
+if 'bot_info' not in st.session_state: 
+    # first check url_params for asssitant_id 
+    # url_params = st.experimental_get_query_params()
+    # if bool(url_params) == True and 'assistant_id' in url_params:
+    #     if url_params['assistant_id'][0] != "":
+    #         bot_found = handler_bot_search(user_search_str=url_params['assistant_id'][0])
+    #         if bot_found == False:
+    #             st.error("Assistant in URL cannot be found")
+    #             st.experimental_set_query_params(assistant_id="")
+    #             render_bot_search() 
+    #         else: 
+    #             # bot found. Get UI to re-render 
+    #             st.experimental_rerun()
+    # else:
+    render_bot_search()
+    st.stop()
+
+logging.info(st.session_state.bot_info)
+logging.info(st.session_state.bot_data)
+
+# if "session_id" not in st.session_state:
+#     if "initial_prompt_msg" in st.session_state.bot_info:
+#         render_bot_details(st.session_state.bot_info)    
+#     else:
+#         handler_bot_search(user_search_str=st.session_state.bot_info['id'])
+#         render_bot_details(st.session_state.bot_info)    
+# else:
+#     render_chat_session()
 
 page_icon = "🥼"  # 🧠 (brain) 🤖 (robot) 🥼 (lab coat) 📖 (open book) ♾️ (infinity)
 st.set_page_config(page_title="Ildebot", page_icon=page_icon)
@@ -22,33 +90,35 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-"""
-Ildebot is a Proof of Concept for a virtually intelligent chat agent that guides you in applying SaaSGrowers.com's First UX Framework.
-View the [blog post about the First UX Framework](https://saasgrowers.com/blog/the-ultimate-user-onboarding-guide-for-b2b-saas-products/).
-"""
+# """
+# Ildebot is a Proof of Concept for a virtually intelligent chat agent that guides you in applying SaaSGrowers.com's First UX Framework.
+# View the [blog post about the First UX Framework](https://saasgrowers.com/blog/the-ultimate-user-onboarding-guide-for-b2b-saas-products/).
+# """
 
-if 'user' not in st.session_state or st.session_state.user['id'] is None:
-    st.markdown("---")
-    # ac.robo_avatar_component()
-    st.write("\n")
-    uu = vuser.app_user()
-    uu.view_get_info()
-    st.stop()
-
-@st.cache_data
-def get_prompt_template():
-    print("Fetching prompt template from file")
-    return PROMPT_TEMPLATE_PATH.read_text()
+"""
+Proof of Concept for Fovi AI chatbots that have a memory of the conversation history and can use that memory to guide the conversation.
+"""
 
 # Choose a model
 with st.sidebar:
     model_name = st.selectbox("Choose the OpenAI chat model to use", ou.get_model_names())
+
+
+class StreamHandler(BaseCallbackHandler):
+    def __init__(self, container, initial_text=""):
+        self.container = container
+        self.text = initial_text
+
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        self.text += token
+        self.container.markdown(self.text)
 
 # Set up memory
 msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
     chat_memory=msgs, return_messages=True, memory_key="history", output_key="output"
 )
+
 if len(msgs.messages) == 0:
     # msgs.add_ai_message("How can I help you?")
     # st.session_state["messages"] = [ChatMessage(role="assistant", content="How can I help you?")]
@@ -67,19 +137,10 @@ for idx, msg in enumerate(msgs.messages):
                 st.write(f"**{step[1]}**")
         st.write(msg.content)
 
-prompt = PromptTemplate(input_variables=["history", "human_input"], template=get_prompt_template())
+prompt = PromptTemplate(input_variables=["history", "human_input"], template=st.session_state.bot_data['initial_prompt_msg'])
 llm = ChatOpenAI(openai_api_key=ou.get_openai_api_key(), model_name=model_name, streaming=True)
 llm_chain = LLMChain(llm=llm, prompt=prompt, memory=memory, output_key='output')
 print(f'llm_chain.input_keys: {llm_chain.input_keys}')
-
-class StreamHandler(BaseCallbackHandler):
-    def __init__(self, container, initial_text=""):
-        self.container = container
-        self.text = initial_text
-
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        self.text += token
-        self.container.markdown(self.text)
 
 if chat_input := st.chat_input():
     # st.session_state.messages.append(ChatMessage(role="user", content=chat_input))
