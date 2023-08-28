@@ -76,15 +76,14 @@ class users:
             self.db.increment_document_fields(collection_name="users", document_id=user_id, field_name=metric_value_pair[0], increment=metric_value_pair[1])
 
 
-    def create_user(self, email, password_hash):
-        user_id = gu.email_to_user_id(email)
+    def create_user(self, user_id, email, password_hash):
         users = self.get_users(user_id=user_id)
 
         if len(users) > 0:
             raise self.BadRequest("Bad request: user exists")
 
         user_dict = {
-            'user_hash': user_id,
+            'user_hash': password_hash,
             'email': email,
             'password_hash': password_hash,
             'created_date': gu.get_current_time(),
@@ -126,12 +125,12 @@ class users:
         # first try to create a user_hash document using the hashed key 
         try:
             logging.info(f'user_id: {user_id} email: {email}')
-            user = self.get_user(user_id=email)
+            user = self.get_user(user_id=user_id)
             logging.info(user)
         except self.UserNotFound:
             logging.info("User not found")
             # create a user with email for user_id 
-            user_id = self.create_user(email=email, password_hash=password_hash)
+            user_id = self.create_user(user_id=user_id, email=email, password_hash=password_hash)
             # get user details 
             user = self.get_user(user_id=user_id) 
         
@@ -139,6 +138,7 @@ class users:
             raise self.UserNotFound("No match for that email and password.")
 
         # Add the supported models list to the user object
+        user['data']['api_key'] = None
         user['data']['supported_models_list'] = []
         print(user)
         return user

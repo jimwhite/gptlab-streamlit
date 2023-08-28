@@ -2,6 +2,7 @@ import traceback
 import streamlit as st
 import api_users as au
 import api_util_general as gu
+import api_util_openai as ou
 import logging
 
 legal_prompt = "Ready to explore the endless possibilities of AI? Review and agree to our Terms of Use and Privacy Policy, available on our Terms page. By signing in, you confirm that you have read and agreed to our policies. Let's get started today!"
@@ -18,14 +19,14 @@ password_placeholder = "Please enter a unique password here..."
 class app_user:
     def __init__(self):
         if 'user' not in st.session_state:
-            st.session_state.user = {'id':None, 'user_hash': None, 'key_supported_models_list':[]}
+            st.session_state.user = {'id':None, 'user_hash': None, 'email':None, 'api_key':None, 'key_supported_models_list':[]}
         self.container = st.container()
         
     def _get_info(self):
         return st.session_state.user 
 
-    def _set_info(self, user_id, email, key_supported_models_list):
-        st.session_state.user = {'id': user_id, 'email': email, 'user_hash' : user_id, 'key_supported_models_list': key_supported_models_list}
+    def _set_info(self, user_id, user_hash, email, api_key:None, key_supported_models_list:None):
+        st.session_state.user = {'id': user_id, 'email': email, 'user_hash' : user_hash, 'api_key':api_key, 'key_supported_models_list': key_supported_models_list}
 
     def view_get_info(self):
         with self.container:
@@ -52,7 +53,7 @@ class app_user:
                     st.error("User password cannot be empty.")
                 raise u.DBError("Password was empty.")
             user = u.get_create_user(email=email, password_hash=gu.hash_user_string(password))           
-            self._set_info(user_id=user['id'], email=user['data']['email'], key_supported_models_list=user['data']['supported_models_list'])
+            self._set_info(user_id=user['id'], user_hash=user['data']['password_hash'], email=user['data']['email'], api_key=ou.get_openai_api_key(), key_supported_models_list=ou.get_model_names())
 
         except u.OpenAIError as e: 
             with self.container:

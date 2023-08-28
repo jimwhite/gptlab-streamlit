@@ -465,7 +465,7 @@ def handler_user_chat():
 
     s = asessions.sessions(user_hash=st.session_state['user']['user_hash'])
     try:
-        session_response = s.get_session_response(session_id=st.session_state.lab_session_id, user_message=user_message)
+        session_response = s.get_session_response(session_id=st.session_state.lab_session_id, user_message=user_message, oai_api_key=st.session_state.user['api_key'])
         if session_response:
             if session_response['user_message_flagged'] == True:
                 flagged_categories_str = ", ".join(session_response['user_message_flagged_categories'])
