@@ -96,6 +96,11 @@ else:
         view_bot_grid(bot_dict=sb, button_disabled=button_enabled)
     with my_bots:
         if len(mb) > 0:
+            # Remove showcased bots from my bots
+            mb_ids = [bot['id'] for bot in mb]
+            for bot in sb:
+                if bot['id'] in mb_ids:
+                    mb = [mbot for mbot in mb if mbot['id'] != bot['id']]
             r.shuffle(mb)
             st.markdown("\n")
             st.markdown("##### Chat with your AI assistants!")
