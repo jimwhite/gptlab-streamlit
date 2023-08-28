@@ -2,6 +2,8 @@ import api_util_firebase as fu
 import api_util_general as gu 
 import api_util_openai as ou
 import streamlit as st 
+import logging
+
 
 class users:
 
@@ -123,8 +125,11 @@ class users:
 
         # first try to create a user_hash document using the hashed key 
         try:
+            logging.info(f'user_id: {user_id} email: {email}')
             user = self.get_user(user_id=email)
+            logging.info(user)
         except self.UserNotFound:
+            logging.info("User not found")
             # create a user with email for user_id 
             user_id = self.create_user(email=email, password_hash=password_hash)
             # get user details 

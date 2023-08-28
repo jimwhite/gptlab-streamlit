@@ -2,7 +2,7 @@ import traceback
 import streamlit as st
 import api_users as au
 import api_util_general as gu
-
+import logging
 
 legal_prompt = "Ready to explore the endless possibilities of AI? Review and agree to our Terms of Use and Privacy Policy, available on our Terms page. By signing in, you confirm that you have read and agreed to our policies. Let's get started today!"
 user_email_prompt = "Please enter your email address: "
@@ -32,25 +32,28 @@ class app_user:
             st.markdown(legal_prompt)
             st.markdown("\n")
             # st.info(user_email_prompt)
-            st.text_input(user_email_prompt, key="user_email_input", placeholder=email_placeholder)
+            st.text_input(user_email_prompt, key="user_email_input", autocomplete="email", placeholder=email_placeholder)
             # st.info(user_password_prompt)
-            st.text_input(user_password_prompt, key="user_password_input", type="password", placeholder=password_placeholder)
+            st.text_input(user_password_prompt, key="user_password_input", type="password", autocomplete="password", placeholder=password_placeholder)
             st.button("Sign In/Up", key="user_signin_button", on_click=self._validate_user_info)
 
     def _validate_user_info(self):
         u = au.users()
 
         try:
-            email=gu.normalize_email(st.session_state.user_email_input)
+            email=st.session_state.user_email_input.strip()
+            if not email:
+                with self.container:
+                    st.error("User email cannot be empty.")
+                raise u.DBError("Email was empty.")
             password = st.session_state.user_password_input.strip()
-            if password:
-                password_hash=gu.hash_user_string(password)
-                user = u.get_create_user(email=email, password_hash=password_hash)           
-                self._set_info(user_id=user['id'], email=user['data']['email'], key_supported_models_list=user['data']['supported_models_list'])
-            else:
+            if not password:
                 with self.container:
                     st.error("User password cannot be empty.")
                 raise u.DBError("Password was empty.")
+            user = u.get_create_user(email=email, password_hash=gu.hash_user_string(password))           
+            self._set_info(user_id=user['id'], email=user['data']['email'], key_supported_models_list=user['data']['supported_models_list'])
+
         except u.OpenAIError as e: 
             with self.container:
                 st.error(f"{str(e)}")
