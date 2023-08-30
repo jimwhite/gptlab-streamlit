@@ -84,6 +84,7 @@ if 'bot_info' not in st.session_state:
 # page_icon = "🥼"  # 🧠 (brain) 🤖 (robot) 🥼 (lab coat) 📖 (open book) ♾️ (infinity)
 bot_name = st.session_state.bot_info['name']
 avatar_url = "https://api.dicebear.com/5.x/bottts-neutral/svg?seed={0}&size=50".format(bot_name)
+# avatar_url = f"app/static/{bot_name}-50.svg".format(bot_name)
 st.set_page_config(page_title=f"Fovi: {bot_name} - Chat", page_icon=avatar_url)
 st.title(f"Chat with {bot_name} &nbsp; ![]({avatar_url})")
 

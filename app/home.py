@@ -1,7 +1,6 @@
 import streamlit as st 
-import app_component as ac 
-import app_utils as au 
 import app_user as uv 
+import app_utils as au 
 
 
 st.set_page_config(
@@ -9,6 +8,9 @@ st.set_page_config(
     page_icon="https://api.dicebear.com/5.x/bottts-neutral/svg?seed=gptLAb"#,
     #menu_items={"About": "Fovi is a user-friendly app that allows anyone to interact with and create their own AI Assistants powered by OpenAI's GPT-3 language model. Our goal is to make AI accessible and easy to use for everyone, so you can focus on designing your Assistant without worrying about the underlying infrastructure.", "Get help": None, "Report a Bug": None}
 )
+
+import app_component as ac 
+import api_bots as ab 
 
 ac.render_cta()
 
@@ -39,9 +41,14 @@ st.markdown("""\n""")
 
 st.markdown("#### Get Started")
 
+b = ab.bots_api()
+sb = b.get_bots(is_show_cased=True)
+
 vu = uv.app_user()
 if 'user' not in st.session_state or st.session_state.user['id'] is None:
     vu.view_get_info()
+    st.write("Come chat with our pre-trained AI assistants.")
+    ac.view_bot_grid(bot_dict=sb, bots_api=b, button_disabled=True)
 else:
     vu.view_success_confirmation()
     st.write("\n")
@@ -54,3 +61,5 @@ else:
     with col2: 
         if st.button("Create your own AI Assistants in the Lab"):
             au.switch_page('lab')
+    st.write("Come chat with our pre-trained AI assistants.")
+    ac.view_bot_grid(bot_dict=sb, bots_api=b, button_disabled=False)

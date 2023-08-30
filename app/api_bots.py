@@ -3,7 +3,11 @@ import api_util_general as gu
 import api_users as uu 
 import enum 
 # Testing only
-#import streamlit as st 
+import streamlit as st 
+
+@st.cache_resource(ttl=60 * 20)
+def bots_api():
+    return bots()
 
 class bots:
 

@@ -1,4 +1,6 @@
 [server]
+enableStaticServing = true
+# serverAddress = https://fovi.com/
 enableXsrfProtection = false
 enableCORS = false
 # port=8080
