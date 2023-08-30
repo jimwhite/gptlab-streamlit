@@ -1,7 +1,8 @@
 import streamlit as st 
-import app_utils as vutil 
 import app_component as ac 
+import app_utils as au 
 import app_user as uv 
+
 
 st.set_page_config(
     page_title="Fovi",
@@ -22,9 +23,9 @@ st.markdown(
 )
 
 #st.title(home_title)
-st.markdown(f"""# {home_title} <span style=color:#2E9BF5><font size=5>Early Access</font></span>""",unsafe_allow_html=True)
+st.markdown(f"""# {home_title} <span style=color:#2E9BF5><br><font size=5>🚧 Under Construction 🚧</font></span>""",unsafe_allow_html=True)
 
-st.markdown("""\n""")
+# st.markdown("""\n""")
 st.markdown("#### Greetings")
 st.write(home_introduction)
 
@@ -35,7 +36,6 @@ st.markdown("#### Privacy")
 st.write(home_privacy)
 
 st.markdown("""\n""")
-st.markdown("""\n""")
 
 st.markdown("#### Get Started")
 
@@ -45,11 +45,12 @@ if 'user' not in st.session_state or st.session_state.user['id'] is None:
 else:
     vu.view_success_confirmation()
     st.write("\n")
+    # If we switch to another page like this then the home page can't be seen when logged in.
+    # au.switch_page('lounge')
     col1, col2 = st.columns(2)
     with col1: 
         if st.button("Hang out with AI Assistants in the Lounge"):
-            vutil.switch_page('lounge')
+            au.switch_page('lounge')
     with col2: 
         if st.button("Create your own AI Assistants in the Lab"):
-            vutil.switch_page('lab')
-
+            au.switch_page('lab')

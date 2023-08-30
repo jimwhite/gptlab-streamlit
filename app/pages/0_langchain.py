@@ -69,8 +69,8 @@ if 'bot_info' not in st.session_state:
     render_bot_search()
     st.stop()
 
-logging.info(st.session_state.bot_info)
-logging.info(st.session_state.bot_data)
+# logging.info(st.session_state.bot_info)
+# logging.info(st.session_state.bot_data)
 
 # if "session_id" not in st.session_state:
 #     if "initial_prompt_msg" in st.session_state.bot_info:
@@ -81,10 +81,11 @@ logging.info(st.session_state.bot_data)
 # else:
 #     render_chat_session()
 
-page_icon = "🥼"  # 🧠 (brain) 🤖 (robot) 🥼 (lab coat) 📖 (open book) ♾️ (infinity)
+# page_icon = "🥼"  # 🧠 (brain) 🤖 (robot) 🥼 (lab coat) 📖 (open book) ♾️ (infinity)
 bot_name = st.session_state.bot_info['name']
-st.set_page_config(page_title=f"Fovi: {bot_name} - Chat", page_icon=page_icon)
-st.title(f"{page_icon} Chat with {bot_name}")
+avatar_url = "https://api.dicebear.com/5.x/bottts-neutral/svg?seed={0}&size=50".format(bot_name)
+st.set_page_config(page_title=f"Fovi: {bot_name} - Chat", page_icon=avatar_url)
+st.title(f"Chat with {bot_name} &nbsp; ![]({avatar_url})")
 
 st.markdown(
     "<style>#MainMenu{visibility:hidden;}</style>",
