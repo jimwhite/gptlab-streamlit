@@ -17,7 +17,7 @@ ac.render_cta()
 # copies 
 home_title = "Fovi Lab"
 home_introduction = "Welcome to Fovi, where the power of OpenAI's GPT technology is at your fingertips. Socialize with pre-trained AI Assistants in the Lounge or create your own custom AI companions in the Lab. Whether you need a personal helper, writing partner, or more, Fovi has you covered. Join now and start exploring the endless possibilities!"
-home_privacy = "At Fovi, your privacy is our top priority. To protect your personal information, our system only uses the hashed value of your OpenAI API Key, ensuring complete privacy and anonymity. Your API key is only used to access AI functionality during each visit, and is not stored beyond that time. This means you can use Fovi with peace of mind, knowing that your data is always safe and secure."
+home_privacy = "Fovi Lab is a demo and under development.  Your personal information such as email, password (in hashed form), and chat history are stored on our servers.  Chat messages and related information are processed by OpenAI and other third-party services."
 
 st.markdown(
     "<style>#MainMenu{visibility:hidden;}</style>",

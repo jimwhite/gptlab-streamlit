@@ -37,7 +37,7 @@ if 'user' not in st.session_state or st.session_state.user['id'] is None:
     uu.view_get_info()
 
     st.write("Come chat with our pre-trained AI assistants.")
-    ac.view_bot_grid(bot_api=b, bot_dict=sb, button_disabled=True)
+    ac.view_bot_grid(bot_dict=sb, bots_api=b, button_disabled=True)
 else:
     button_enabled = False 
     mb = b.get_bots(user_id=st.session_state.user['id'])
