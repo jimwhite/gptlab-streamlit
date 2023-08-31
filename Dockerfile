@@ -16,5 +16,6 @@ RUN pip install -r requirements.txt
 ENTRYPOINT ["streamlit", "run", "home.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
 
 # docker buildx build -t fovi-lab .
-# docker run -p 8080:8080 --env OPENAI_API_KEY="$OPENAI_API_KEY" fovi-lab
+# docker run -p 8080:8080 --env OPENAI_API_KEY="$OPENAI_API_KEY" --env GOOGLE_APPLICATION_CREDENTIALS_JSON="`cat ~/.gcloud/fovi-site-firebase-adminsdk.json`" fovi-lab
 # gcloud builds submit --tag gcr.io/fovi-site/fovi-lab
+# docker run -p 8080:8080 --env OPENAI_API_KEY="$OPENAI_API_KEY" gcr.io/fovi-site/fovi-lab:latest

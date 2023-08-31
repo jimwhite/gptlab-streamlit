@@ -7,9 +7,12 @@ import os
 
 class firestore_db:
     def __init__(self):
-        if os.path.exists("fovi-site-firebase-adminsdk.json"):
-            print("Using service account credentials")
-            self.db = firestore.Client.from_service_account_json("fovi-site-firebase-adminsdk.json")
+        if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_JSON'):
+            print("Using environment variables")
+            self.db = firestore.Client.from_service_account_info(json.loads(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_JSON')))
+        # elif os.path.exists("fovi-site-firebase-adminsdk.json"):
+        #     print("Using service account credentials")
+        #     self.db = firestore.Client.from_service_account_json("fovi-site-firebase-adminsdk.json")
         else:
             # Application Default credentials are automatically created.
             self.db = firestore.Client()
