@@ -30,13 +30,21 @@ class app_user:
 
     def view_get_info(self):
         with self.container:
+            try:
+                self._signin_form()
+            except Exception as e:
+                traceback.print_exc()
+                st.error("Something went wrong. Please try again.")
+
+    def _signin_form(self):
+        with st.form("signin_form"):
             st.markdown(legal_prompt)
             st.markdown("\n")
-            # st.info(user_email_prompt)
+                # st.info(user_email_prompt)
             st.text_input(user_email_prompt, key="user_email_input", autocomplete="email", placeholder=email_placeholder)
-            # st.info(user_password_prompt)
+                # st.info(user_password_prompt)
             st.text_input(user_password_prompt, key="user_password_input", type="password", autocomplete="password", placeholder=password_placeholder)
-            st.button("Sign In/Up", key="user_signin_button", on_click=self._validate_user_info)
+            st.form_submit_button("Sign In/Up", on_click=self._validate_user_info)
 
     def _validate_user_info(self):
         u = au.users()
@@ -55,6 +63,9 @@ class app_user:
             user = u.get_create_user(email=email, password_hash=gu.hash_user_string(password))           
             self._set_info(user_id=user['id'], user_hash=user['data']['password_hash'], email=user['data']['email'], api_key=ou.get_openai_api_key(), key_supported_models_list=ou.get_model_names())
 
+        except au.users.UserNotFound:
+            with self.container:
+                st.error(user_email_failed)
         except u.OpenAIError as e: 
             with self.container:
                 st.error(f"{str(e)}")

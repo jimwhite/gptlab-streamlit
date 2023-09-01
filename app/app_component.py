@@ -39,6 +39,7 @@ def render_cta():
       st.write("Let's connect!")
       st_button(url="http://linkedin.com/in/jamespaulwhite/", label="LinkedIn", font_awesome_icon="fa-linkedin")
 
+
 def view_bot_grid(bot_dict, bots_api=ab.bots_api(), button_disabled=False, show_bot_id=False): 
 
     col1, col2 = st.columns(2)
