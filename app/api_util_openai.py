@@ -6,7 +6,7 @@ import logging
 import os
 
 # Get an OpenAI API Key before continuing
-@st.cache_data(ttl=60 * 60 * 6)
+@st.cache_data(ttl=60 * 20)
 def get_openai_api_key():
     if "openai_api_key" in st.secrets:
         return st.secrets.openai_api_key
@@ -15,7 +15,7 @@ def get_openai_api_key():
     return None
 
 
-@st.cache_data(ttl=60 * 60 * 6)
+@st.cache_data(ttl=60 * 20)
 def get_model_names():
     print("Fetching model names from OpenAI API")
     models = openai.Model.list(openai_api_key=get_openai_api_key())

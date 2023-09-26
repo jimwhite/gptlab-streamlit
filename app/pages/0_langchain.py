@@ -15,7 +15,6 @@ import api_bots as bots
 import api_util_openai as ou
 import app_utils as au 
 
-import logging
 
 if 'user' not in st.session_state or st.session_state.user['id'] is None:
     st.markdown("---")
@@ -113,9 +112,9 @@ class StreamHandler(BaseCallbackHandler):
         self.container.markdown(self.text)
 
 # Set up memory
-msgs = StreamlitChatMessageHistory()
+msgs = StreamlitChatMessageHistory(key=f"langchain_messages:{st.session_state.bot_info['id']}")
 memory = ConversationBufferMemory(
-    chat_memory=msgs, return_messages=True, memory_key="history", output_key="output"
+    chat_memory=msgs, return_messages=True, memory_key='history', output_key='output'
 )
 
 if len(msgs.messages) == 0:
@@ -125,7 +124,7 @@ if len(msgs.messages) == 0:
     msgs.add_ai_message("Hello!")
     st.session_state.steps = {}
 
-avatars = {"human": "user", "ai": "assistant"}
+avatars = {'human': 'user', 'ai': 'assistant'}
 for idx, msg in enumerate(msgs.messages):
     with st.chat_message(avatars[msg.type]):
         # Render intermediate steps if any were saved
