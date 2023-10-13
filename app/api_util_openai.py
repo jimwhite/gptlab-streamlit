@@ -15,12 +15,15 @@ def get_openai_api_key():
     return None
 
 
+def is_chat_model(id: str) -> bool:
+    return id.startswith("gpt") and not "instruct" in id
+
 @st.cache_data(ttl=60 * 20)
 def get_model_names():
     print("Fetching model names from OpenAI API")
     models = openai.Model.list(openai_api_key=get_openai_api_key())
     print(f"Fetched {len(models)} models from OpenAI API")
-    return [model["id"] for model in models["data"] if model["id"].startswith("gpt")]
+    return [model["id"] for model in models["data"] if is_chat_model(model["id"])]
 
 
 class open_ai:

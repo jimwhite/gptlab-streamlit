@@ -115,7 +115,7 @@ class bots:
                 'model_config': model['data']['config']
             })
         else:
-            raise self.BotIncomplete("Bot configuration: bot missing initial prompt")         
+            raise self.BotIncomplete("Bot configuration: bot missing model config")         
 
         return bot_dict 
 

@@ -165,6 +165,9 @@ global_salt = "OPTIONAL GLOBAL SALT value but must be defined, even if empty str
 4. In your terminal, set up your local envionrment: 
     - Set up a Python virtual environment (using `venv`, `conda`, `virtualenv`, or any other tool you prefer)
     - Install the required Python dependencies (`pip install -r app/requirements.txt`)
+    ```
+    export GOOGLE_APPLICATION_CREDENTIALS_JSON="`cat ~/.gcloud/fovi-site-firebase-adminsdk.json`"
+    ```
     - Run `streamlit run app/home.py --server.enableCORS=false --server.enableXsrfProtection=false`
 
 ## Running in Google Cloud Run

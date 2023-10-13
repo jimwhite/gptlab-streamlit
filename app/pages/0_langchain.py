@@ -1,11 +1,10 @@
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
+from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.prompts import PromptTemplate
-
-from pathlib import Path
 
 import streamlit as st
 
@@ -15,6 +14,7 @@ import api_bots as bots
 import api_util_openai as ou
 import app_utils as au 
 
+import logging
 
 if 'user' not in st.session_state or st.session_state.user['id'] is None:
     st.markdown("---")
@@ -68,8 +68,8 @@ if 'bot_info' not in st.session_state:
     render_bot_search()
     st.stop()
 
-# logging.info(st.session_state.bot_info)
-# logging.info(st.session_state.bot_data)
+logging.info(st.session_state.bot_info)
+logging.info(st.session_state.bot_data)
 
 # if "session_id" not in st.session_state:
 #     if "initial_prompt_msg" in st.session_state.bot_info:
@@ -93,8 +93,14 @@ st.markdown(
 )
 
 # Choose a model
+model = st.session_state.bot_data['model_config']['model']
 with st.sidebar:
-    model_name = st.selectbox("Choose the OpenAI chat model to use", ou.get_model_names())
+    model_names = ou.get_model_names()
+    model_index = 0
+    if model in model_names:
+        model_index = model_names.index(model)
+    model = st.selectbox("Choose the OpenAI chat model to use", model_names, index=model_index)
+    logging.info(model)
 
 """
 Proof of Concept for Fovi AI chatbots that have a memory of the conversation history and can use that memory to guide the conversation.
@@ -137,7 +143,11 @@ for idx, msg in enumerate(msgs.messages):
         st.write(msg.content)
 
 prompt = PromptTemplate(input_variables=["history", "human_input"], template=st.session_state.bot_data['initial_prompt_msg'])
-llm = ChatOpenAI(openai_api_key=ou.get_openai_api_key(), model_name=model_name, streaming=True)
+if 'instruct' in model:
+    logging.info('instruct')
+    llm = OpenAI(openai_api_key=ou.get_openai_api_key(), model_name=model, streaming=True)
+else:
+    llm = ChatOpenAI(openai_api_key=ou.get_openai_api_key(), model_name=model, streaming=True)
 llm_chain = LLMChain(llm=llm, prompt=prompt, memory=memory, output_key='output')
 print(f'llm_chain.input_keys: {llm_chain.input_keys}')
 
